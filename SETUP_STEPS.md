@@ -44,3 +44,4 @@ git push origin main
 - 포트 4000이 이미 사용 중: `bundle exec jekyll serve --port 4001` 사용
 - 변경사항이 안 보일 때: 브라우저 캐시 삭제 (Ctrl + Shift + R)
 
+
