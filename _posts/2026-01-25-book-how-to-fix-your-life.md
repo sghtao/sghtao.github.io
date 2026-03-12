@@ -1,8 +1,8 @@
 ---
 title: "인생 고치는 법을 읽고"
 date: 2026-01-25
-categories: [Books]
-tags: [self-improvement, mindset]
+categories: [Thoughts]
+tags: [thoughts, self-improvement, mindset]
 ---
 
 

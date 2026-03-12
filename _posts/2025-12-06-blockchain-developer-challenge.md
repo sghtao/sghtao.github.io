@@ -1,8 +1,8 @@
 ---
 title: "데이터 사이언스 학부생의 블록체인 개발 도전"
 date: 2025-12-19
-categories: [Blockchain, Study]
-tags: [blockchain, development, data-science]
+categories: [Thoughts]
+tags: [thoughts, blockchain, data-science]
 ---
 
 개발 블로그 시작.
