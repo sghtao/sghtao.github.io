@@ -1,12 +1,12 @@
 ---
 title: "데이터사이언스 전공자가 바라보는 이더리움 vs 솔라나"
 date: 2025-12-19
-categories: [블록체인, 분석]
-tags: [이더리움, 솔라나, 블록체인, 데이터사이언스, 비교분석]
+categories: [Blockchain, Study]
+tags: [ethereum, solana, blockchain, data-science]
 ---
 
 
-학습 방향(솔리디티 vs 러스트)을 결정하려면, “블록체인 = 데이터베이스 + 실행환경(가상머신)” 프레임으로 EVM과 Solana(Sealevel/SVM)를 대비시키는 구성
+학습 방향(솔리디티 vs 러스트)을 결정하려면, "블록체인 = 데이터베이스 + 실행환경(가상머신)" 프레임으로 EVM과 Solana(Sealevel/SVM)를 대비시키는 구성
 DB 관점 → 아키텍처(EVM vs Sealevel) → 데이터 접근/분석 → 언어 선택
 
 ## 블록체인이란?
@@ -33,11 +33,3 @@ https://101blockchains.com/blockchain-vs-relational-database/
 - [[Ethereum Docs] The EVM (Ethereum Virtual Machine)](https://ethereum.org/developers/docs/evm/)
 - [이더리움 공식 문서](https://ethereum.org/)
 - [솔라나 공식 문서](https://solana.com/)
-
-
-
-
-
-
-
-

@@ -1,18 +1,18 @@
 ---
 title: "Cyfrin Updraft Solidity Smart Contract Developer 트랙 시작"
 date: 2026-01-28
-categories: [개발]   
-tags: [블록체인, 솔리디티, 스마트 컨트랙트, 크립토] 
+categories: [Blockchain, Study]
+tags: [blockchain, solidity, smart-contract, crypto]
 ---
 
 
 Cyfrin Updraft라는 Web3, 블록체인 교육 플랫폼에서 개발 공부를 시작하려 한다.
 블록체인 기초부터, 솔리디티, DeFI 등 다양한 트랙이 있으며, 나는 Solidity Smart Contract Developer 트랙을 선택한다.
 
-이 트랙을 따르면, Solidity와 Foundry를 배울 수 있어 이 트랙을 선정했다. 나의 전공인 데이터사이언스와 블록체인이 만나는 지점이 내가 가야할 길이자, 나만의 강점과 색을 갖는 길이라고 생각했다. 
+이 트랙을 따르면, Solidity와 Foundry를 배울 수 있어 이 트랙을 선정했다. 나의 전공인 데이터사이언스와 블록체인이 만나는 지점이 내가 가야할 길이자, 나만의 강점과 색을 갖는 길이라고 생각했다.
 그래서 나는 온체인 데이터 분석이 가능한 블록체인 개발자, 혹은 블록체인 개발이 가능한 온체인 분석가가 되면 좋겠다는 생각을 했다.
 온체인 데이터 분석에 대해서는 이와 같이 병행하여 공부할 계획이고, 블록체인 개발에 대해서는 이 트랙을 통해 공부할 예정이다.
-솔리디티는 가장 널리 쓰이는 스마트 컨트랙트 프로그래밍 언어이다. 
+솔리디티는 가장 널리 쓰이는 스마트 컨트랙트 프로그래밍 언어이다.
 
 
 ## 퀴즈 내용

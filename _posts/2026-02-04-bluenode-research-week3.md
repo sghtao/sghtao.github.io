@@ -1,10 +1,9 @@
 ---
 title: "리서치팀 자료 학습(3주차)"
 date: 2026-02-04
-categories: [블록체인, 리서치]
-tags: [블록체인, 리서치]
+categories: [Blockchain, BlueNode]
+tags: [blockchain, bluenode, ethereum]
 ---
-
 
 
 
