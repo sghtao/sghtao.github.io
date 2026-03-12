@@ -15,7 +15,7 @@ timezone: Asia/Seoul # Force rebuild
 # jekyll-seo-tag settings › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/usage.md
 # ↓ --------------------------
 
-title: 0xGiho # the main title
+title: Sirfetch'd # the main title
 
 tagline: From Data Science to Blockchain # it will display as the subtitle
 
