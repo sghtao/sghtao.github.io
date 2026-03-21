@@ -1,6 +1,6 @@
 ---
 title: "이더리움 - 블루노드 온보딩 스터디 2주차"
-date: 2026-03-12 00:00:00 +0900
+date: 2026-03-22 00:00:00 +0900
 categories: [Blockchain, BlueNode, study]
 tags: [blockchain, ethereum, bluenode, onboarding-study]
 ---
