@@ -3,25 +3,28 @@ icon: fas fa-satellite-dish
 order: 3
 ---
 
-<p class="now-updated">Last updated: March 2026 · Seoul, Korea</p>
+<p class="now-updated">Last updated: March 2026 · Incheon, Korea</p>
 
 A snapshot of what I'm spending time on right now.
 
-## Working on
+## Now
 
-- <!-- e.g. Building a DeFi TVL tracker on Dune -->
-- <!-- e.g. Writing a research series on Bitcoin L2s -->
-- <!-- e.g. Contributing to an open-source analytics project -->
-
-## Reading
-
-- <!-- e.g. *The Bitcoin Standard* — Saifedean Ammous -->
-- <!-- e.g. Recent papers on MEV and order flow auctions -->
+- [RWA Research Project](https://medium.com/@sghtao55) — revising based on feedback received; reflection post pending
+- [[한국데이터정보과학회-SAS KOREA] 2nd Data Analysis Competition](https://kdiss.or.kr/board/competition_info)
+- [BuidlHack 2026](https://www.buidlkorea.com/buidlhack2026)
+- [XRPL Korea Financial Innovation Program 2026](https://program.xrplkorea.org/)
 
 ## Learning
 
-- <!-- e.g. Rust for smart contract development -->
-- <!-- e.g. Advanced SQL for on-chain data pipelines -->
+- BlueNode Onboarding Study
+- INHACK System Hacking Study
+- Data Science coursework (undergraduate semester)
+
+## Beyond
+
+- Reading: *Reality Transurfing*
+- Running
+- Teaching CSAT English to high school students
 
 ---
 

@@ -9,11 +9,11 @@ Places you can find me and things I publish.
 ## Writing & Research
 
 <div class="links-grid">
-  <a href="https://medium.com/@zeolpyeon" class="link-card" target="_blank" rel="noopener">
+  <a href="https://medium.com/@sghtao55" class="link-card" target="_blank" rel="noopener">
     <i class="fab fa-medium"></i>
     <div class="link-card-text">
       <span class="link-card-name">Medium</span>
-      <span class="link-card-handle">@zeolpyeon</span>
+      <span class="link-card-handle">@sghtao55</span>
     </div>
   </a>
   <a href="https://dune.com/zeolpyeon" class="link-card" target="_blank" rel="noopener">
@@ -28,14 +28,14 @@ Places you can find me and things I publish.
 ## Social
 
 <div class="links-grid">
-  <a href="https://x.com/zeolpyeon" class="link-card" target="_blank" rel="noopener">
+  <a href="https://x.com/zeolpyeon_" class="link-card" target="_blank" rel="noopener">
     <i class="fa-brands fa-x-twitter"></i>
     <div class="link-card-text">
       <span class="link-card-name">X</span>
-      <span class="link-card-handle">@zeolpyeon</span>
+      <span class="link-card-handle">@zeolpyeon_</span>
     </div>
   </a>
-  <a href="https://linkedin.com/in/giho-shin" class="link-card" target="_blank" rel="noopener">
+  <a href="https://www.linkedin.com/in/giho-shin-559b373b0/" class="link-card" target="_blank" rel="noopener">
     <i class="fab fa-linkedin"></i>
     <div class="link-card-text">
       <span class="link-card-name">LinkedIn</span>
