@@ -125,7 +125,7 @@ G는 secp256k1 위에 미리 정해진 생성점(Generator Point)이다. G는 �
 ```
 
 개인키와 생성점 G를 스칼라 곱하여 공개키를 계산하고, 이 공개키를 다시 해시해서 이더리움 주소가 만들어진다. 이것이 내 지갑의 소유권을 수학적으로 증명할 수 있는 이유다.
-
+![account_generation](/assets/img/account_generation.png)
 ---
 
 ## 4. 지갑 (Wallet)
