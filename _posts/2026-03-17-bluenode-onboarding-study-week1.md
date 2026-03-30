@@ -1,7 +1,7 @@
 ---
 title: "비트코인 이론 및 백서 - 블루노드 온보딩 스터디 1주차"
 date: 2026-03-17 00:00:00 +0900
-categories: [Blockchain, BlueNode, Study, Bitcoin, study]
+categories: [Blockchain, BlueNode, Bitcoin, Onboarding Study]
 tags: [blockchain, bitcoin, bluenode, onboarding-study]
 ---
 

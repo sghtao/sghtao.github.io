@@ -1,7 +1,7 @@
 ---
 title: "Mitigation, Stack Canary, NX, ASLR, PIE, RELRO - 시스템 해킹 스터디 4주차"
 date: 2026-03-31 00:00:00 +0900
-categories: [Security, study]
+categories: [Security, System Hacking Study]
 tags: [security, system-hacking, mitigation, canary, NX, ASLR, PIE, RELRO]
 ---
 

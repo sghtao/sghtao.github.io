@@ -1,7 +1,7 @@
 ---
 title: "Linux Memory Layout, x86 Assembly - 시스템 해킹 스터디 3주차"
 date: 2026-03-23 00:00:00 +0900
-categories: [Security, study]
+categories: [Security, System Hacking Study]
 tags: [security, system-hacking, linux, assembly]
 ---
 
