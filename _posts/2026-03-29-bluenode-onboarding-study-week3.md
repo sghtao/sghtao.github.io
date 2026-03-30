@@ -1,6 +1,6 @@
 ---
 title: "지갑, 토큰, 암호학 - 블루노드 온보딩 스터디 3주차"
-date: 2026-03-31 00:00:00 +0900
+date: 2026-03-29 00:00:00 +0900
 categories: [BlueNode, study]
 tags: [blockchain, ethereum, bluenode, ecc, wallet, token, erc20, nft]
 ---
