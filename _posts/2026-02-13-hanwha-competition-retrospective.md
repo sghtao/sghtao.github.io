@@ -1,7 +1,7 @@
 ---
 title: "한화생명 미래금융인재 공모전 회고: 비즈니스 제안부터 리서치까지"
 date: 2026-02-13 00:02:00 +0900
-categories: [Blockchain, Competition]
+categories: [BlueNode - Blockchain, Competition]
 tags: [blockchain, competition, bluenode]
 ---
 
@@ -17,3 +17,8 @@ tags: [blockchain, competition, bluenode]
 
 
 우리 팀은 Hanwha Life Future Talent Contest에서 '한화그룹 맞춤 블록체인 전략 로드맵'을 제안하였으며, RWA(Real World Asset)와 STO(Security Token Offering)에 대한 기초 조사를 완료하였다. 공모전 결과와 무관하게, 이번 경험을 학술적 포트폴리오로 발전 시켜 학회 미디엄 게재, 발표, 대회 참가 등 취업 경쟁력을 강화하고자 한다.
+
+
+
+피그마에 정리했던 것도 사진 가져오기.
+

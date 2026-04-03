@@ -1,7 +1,7 @@
 ---
 title: "리서치팀 자료 학습(2주차)"
 date: 2026-02-02
-categories: [Blockchain, BlueNode]
+categories: [BlueNode - Blockchain]
 tags: [blockchain, bluenode, bitcoin]
 ---
 블루노드에서 내가 속한 곳은 개발 팀이지만, 한화생명 미래금융인재 공모전에서 제출한 보고서를 디벨롭 시켜서 리서치 팀과 함께 성과를 공유할 수 있는 좋은 기회가 생겨, 동계 리서치팀 카톡방에 초대되었다.

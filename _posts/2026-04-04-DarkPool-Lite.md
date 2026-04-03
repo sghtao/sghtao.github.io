@@ -2,7 +2,7 @@
 layout: post
 title: "DarkPool Lite"
 date: 2026-04-04 02:00:00 +0900
-categories: [Hackathon, Blockchain, Competetion]
+categories: [Blockchain, Hackathon]
 tags: [DarkPool, TEE, DEX, MEV, BuidlHack]
 ---
 
