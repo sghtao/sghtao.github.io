@@ -80,6 +80,56 @@ darkpool-lite-ai-matching/
 ### 현승님과 정해야 할 사항
 - 가격 피드 형식
 - 알고리즘 호출 인터페이스
+#### 질문과 답변
+매칭 알고리즘 호출 인터페이스
+현승님 TEE 엔진이 제 매칭 로직을 호출할 때, 아래 같은 형태를 생각하고 있습니다.
+
+입력 (현승님 → 기호)
+주문 리스트. 각 주문에 이 정도 필드가 있으면 충분합니다.
+order_id: str (주문 고유 ID)
+side: "buy" | "sell"
+token_pair: str (예: "BNB/USDT")
+amount: float (수량)
+limit_price: float (매수: 최대 지불가, 매도: 최소 수취가)
+timestamp: float (주문 접수 시각, unix)
+
+추가로 넣어야 할 필드가 있으면 알려주세요.
+
+출력 (기호 → 현승님)
+matches: [{maker_order_id, taker_order_id, fill_amount, execution_price}]
+remaining_orders: 미체결/부분체결 잔여 주문 리스트 (잔여 수량 포함)
+fair_price: 이번 라운드에 사용한 기준 공정가
+error: 에러 발생 시 메시지 (정상이면 null)
+
+가격 피드 데이터 형식
+저는 PancakeSwap V3 Subgraph + Binance API에서 실시간 시세를 수집해서 공정가를 산출할 건데요, 두 가지 방식이 가능합니다.
+
+A) 제가 직접 가격을 수집해서 매칭할 때 내부적으로 사용
+→ 현승님 쪽에서는 주문 리스트만 넘겨주시면 됩니다.
+
+B) 현승님 쪽에서 가격 데이터를 수집해서 호출 시 함께 전달
+→ 입력에 price_data 필드가 추가됩니다.
+
+현승님 쪽 구조에서 어느 쪽이 자연스러운지 알려주시면 맞추겠습니다.
+
+상태 관리 (사소한 건)
+슬리피지 보호를 위해 직전 라운드의 공정가가 필요합니다.
+A) 현승님이 매 호출 시 prev_fair_price를 파라미터로 넘겨주기
+B) 제 모듈 내부에서 변수로 관리
+
+현승님 쪽에서 관리하시는 게 편하면 A로, 아니면 B로 가겠습니다.
+
+매칭 알고리즘 호출 인터페이스
+입출력 구조 자체는 깔끔한데, 필드 하나만 추가하면 좋을 것 같습니다. 매칭 결과를 BSC 컨트랙트에 보낼 때, 누구의 자산을 누구에게 보낼지 주소가 있어야 하고 TEE 엔진에서 나중에 서명할 때, maker/taker의 지갑 주소를 매칭 결과에 포함시켜야 하니 주문 단계에서 받아둘 수 있도록 입력에 wallet_addr를 포함시켜주세요!
+
+가격 피드 -> A안
+TEE 엔진 입장에서 가격 피드 수집까지 책임지면 TEE 엔진 쪽 복잡도가 올라간다고 생각합니다.  TEE 엔진에서는 주문 수신 -> 저장 -> 매칭 호출 -> 서명 -> 컨트랙트 전달 파이프라인에 집중하는 게 낫고, 가격 로직은 AI 매칭 모듈 안에서 완결되는 게 경계가 깔끔할거 같아요. 
+또한 어차피 TEE 안에서 AI 매칭 모듈이 돌아가니까 AI 매칭 모듈이 TEE 내부에서 직접 외부 API를 호출해도 프라이버시에 문제 없을거 같아요. TEE 밖으로 주문 정보가 나가는 게 아니라 시세를 가져오는 거라 방향이 반대니까요.
+정리하면  제 쪽에서는 주문 리스트만 넘기면 되고, 기호님 모듈이 가격 수집 + 매칭을 한 번에 처리해서 결과를 리턴하는 구조가 될 것 같습니다.
+
+상태 관리 -> B안
+TEE 엔진은 매칭 로직의 내부 상태를 몰라야 한다고 생각합니다. TEE 엔진이 매번 prev_fair_price를 추적해서 넘기면 TEE 엔진이 매칭 로직에 의존성이 생기고, 나중에 슬리피지 기준이 바뀌면 양쪽 다 고쳐야 하니... 매칭 모듈을 블랙박스로 호출하는 구조가 깔끔할 것 같습니다. 기호님 쪽에서 내부 변수로 관리하면 매칭 로직 변경이 AI 매칭 모듈 안에서 완결될 것 같습니다.
+
 
 ## 유저플로우 정의
 
@@ -399,312 +449,259 @@ async def run_matching(orders: list[Order]) -> MatchingResponse:
 ```
 
 ## 개발 액션 플랜
-4/18 파이널 피치 역산. 총 8단계, 각 단계별 Claude Code / Cursor 역할 구분.
+개발 액션 플랜 (Cursor 중심)
+Phase 1: types.py (Day 1)
+Cursor 프롬프트:
+@docs/INTERFACE_SPEC.md 를 참고해서 matching/types.py를 작성해줘.
 
-### Phase 0: 프로젝트 재세팅 (Day 1 전반)
-기존 폴더 구조를 새 구조로 교체.
-Claude Code:
-기존 폴더 구조를 삭제하고 아래 새 구조로 재생성해줘. 기존 README, .gitignore는 유지.
+pydantic BaseModel 사용. 아래 모델들이 필요해:
+- Order: order_id, side(Literal["buy","sell"]), token_pair, amount, limit_price, timestamp, wallet_addr
+- MatchResult: match_id, maker_order_id, maker_wallet, taker_order_id, taker_wallet, token_pair, fill_amount, execution_price
+- RemainingOrder: order_id, side, token_pair, original_amount, remaining_amount, limit_price, wallet_addr
+- MatchingResponse: matches(list[MatchResult]), remaining_orders(list[RemainingOrder]), fair_price(float), error(str|None=None)
 
-```text
-darkpool-lite-ai-matching/
-├── price_feed/
-│   ├── __init__.py
-│   ├── pancakeswap.py        # PancakeSwap V3 Subgraph 가격 수집
-│   ├── binance.py             # Binance REST API 가격 수집
-│   └── aggregator.py          # 복수 소스 가중 평균 산출
-├── matching/
-│   ├── __init__.py
-│   ├── types.py               # Order, MatchResult, MatchingResponse 데이터 클래스
-│   ├── prompt.py              # 시스템 프롬프트 + 매칭 규칙 정의
-│   ├── schema.py              # LLM 응답 JSON 스키마 / function calling 정의
-│   ├── engine.py              # NEAR AI Cloud 호출 (OpenAI SDK)
-│   └── validator.py           # 후검증
-├── fallback/
-│   ├── __init__.py
-│   └── dex_router.py          # DEX 폴백 라우팅 (P2)
-├── tests/
-│   ├── __init__.py
-│   ├── test_price_feed.py
-│   ├── test_matching.py
-│   └── test_validator.py
-├── interface.py                # 현승 TEE 엔진이 호출하는 진입점
-├── state.py                    # prev_fair_price 내부 상태 관리
-└── requirements.txt
-```
+JSON 직렬화가 바로 되어야 하고, 각 모델에 사용 예시를 docstring으로 포함해줘.
+state.py는 10줄이라 Cursor에서 직접 작성.
+Git commit: feat: define data types and state management
 
-각 .py에는 역할 독스트링만 넣어줘.
-__init__.py는 비워둬.
-requirements.txt에는:
-```text
-httpx>=0.27,<1.0    # PancakeSwap Subgraph + Binance API 호출
-openai>=1.30,<2.0   # NEAR AI Cloud 호출 (OpenAI SDK 호환)
-pydantic>=2.7,<3.0  # 데이터 모델 검증
-pytest>=8.0,<9.0    # 테스트
-pytest-asyncio>=0.23,<1.0  # 비동기 테스트
-```
+Phase 2: price_feed 모듈 (Day 2)
+2a. pancakeswap.py
+Cursor 프롬프트:
+@docs/ARCHITECTURE.md 의 3-1 가격 피드 수집 섹션을 참고해서 price_feed/pancakeswap.py를 작성해줘.
 
-Cursor: Claude Code 실행 후 파일 트리 확인, git commit.
-```bash
-git add .
-git commit -m "refactor: restructure for NEAR AI Cloud API architecture"
-git push
-```
-
-### Phase 1: types.py (Day 1 후반)
-모든 모듈이 참조하는 데이터 타입 확정. wallet_addr 포함.
-Claude Code:
-matching/types.py를 작성해줘. 현승님과 합의된 인터페이스 기반.
-
-요구사항:
-- dataclass 또는 pydantic BaseModel 사용 (pydantic 권장 — JSON 직렬화 + 검증 내장)
-- Order: order_id(str), side(Literal["buy","sell"]), token_pair(str), amount(float),
-  limit_price(float), timestamp(float), wallet_addr(str)
-- MatchResult: match_id(str), maker_order_id(str), maker_wallet(str),
-  taker_order_id(str), taker_wallet(str), token_pair(str), fill_amount(float),
-  execution_price(float)
-- MatchingResponse: matches(list[MatchResult]), remaining_orders(list[RemainingOrder]),
-  fair_price(float), error(str|None)
-- RemainingOrder: order_id(str), side(str), token_pair(str), original_amount(float),
-  remaining_amount(float), limit_price(float), wallet_addr(str)
-- 각 모델에 model_config로 JSON 직렬화 예시를 docstring에 포함해줘
-
-Cursor: 생성된 types.py 리뷰, import 경로 확인, git commit.
-
-### Phase 2: state.py (Day 1 후반)
-간단하지만 먼저 만들어야 validator에서 참조 가능.
-Cursor에서 직접 작성 (10줄 미만이라 Claude Code 불필요):
-```python
-"""prev_fair_price 등 매칭 모듈 내부 상태 관리"""
-
-class MatchingState:
-    def __init__(self):
-        self._prev_fair_price: float | None = None
-
-    @property
-    def prev_fair_price(self) -> float | None:
-        return self._prev_fair_price
-
-    def update_fair_price(self, new_price: float):
-        self._prev_fair_price = new_price
-
-# 모듈 레벨 싱글턴
-matching_state = MatchingState()
-```
-Git commit.
-
-### Phase 3: price_feed 모듈 (Day 2)
-3a. pancakeswap.py
-Claude Code:
-price_feed/pancakeswap.py를 작성해줘.
-
-요구사항:
-- httpx 사용 (동기 또는 비동기 — async 선호)
-- 엔드포인트: [https://api.thegraph.com/subgraphs/name/pancakeswap/exchange-v3-bsc](https://api.thegraph.com/subgraphs/name/pancakeswap/exchange-v3-bsc)
-- GraphQL 쿼리로 WBNB/USDT 풀의 token0Price를 가져온다
+- httpx AsyncClient 사용, 타임아웃 3초
+- PancakeSwap V3 Subgraph 엔드포인트: https://api.thegraph.com/subgraphs/name/pancakeswap/exchange-v3-bsc
 - WBNB 주소: 0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c
 - USDT 주소: 0x55d398326f99059fF775485246999027B3197955
-- totalValueLockedUSD 내림차순으로 가장 큰 풀 1개만 가져온다
-- 타임아웃 3초
+- GraphQL로 totalValueLockedUSD 내림차순 첫 번째 풀의 token0Price 가져오기
 - 실패 시 None 반환 (예외 삼키고 로그)
-- 함수 시그니처: async def fetch_pancakeswap_price(token_pair: str) -> float | None
-- 해커톤이라 BNB/USDT 하드코딩 OK, 나중에 토큰 주소 매핑 딕셔너리로 확장 가능한 구조
-
-Cursor: 생성된 코드에서 실제 API 호출 테스트. 터미널에서 빠르게 확인:
-```python
-import asyncio
+- 시그니처: async def fetch_pancakeswap_price(token_pair: str) -> float | None
+터미널에서 바로 테스트:
+pythonimport asyncio
 from price_feed.pancakeswap import fetch_pancakeswap_price
 print(asyncio.run(fetch_pancakeswap_price("BNB/USDT")))
-```
+2b. binance.py
+Cursor 프롬프트:
+@price_feed/pancakeswap.py 와 같은 패턴으로 price_feed/binance.py를 작성해줘.
 
-3b. binance.py
-Claude Code:
-price_feed/binance.py를 작성해줘.
-
-요구사항:
-- httpx 사용 (async)
-- 엔드포인트: GET [https://api.binance.com/api/v3/ticker/price?symbol=BNBUSDT](https://api.binance.com/api/v3/ticker/price?symbol=BNBUSDT)
+- GET https://api.binance.com/api/v3/ticker/price?symbol=BNBUSDT
 - token_pair "BNB/USDT" → "BNBUSDT"로 변환
 - 타임아웃 2초
-- 실패 시 None 반환
-- 함수 시그니처: async def fetch_binance_price(token_pair: str) -> float | None
+- 나머지 패턴은 pancakeswap.py와 동일
+2c. aggregator.py
+Cursor 프롬프트:
+@price_feed/pancakeswap.py @price_feed/binance.py 를 조합하는 price_feed/aggregator.py를 작성해줘.
 
-Cursor: 동일하게 실제 호출 테스트.
-
-3c. aggregator.py
-Cursor에서 직접 작성 (로직 단순):
-```python
-PANCAKE_WEIGHT = 0.6
-BINANCE_WEIGHT = 0.4
-
-async def get_fair_price(token_pair: str) -> float | None:
-    pancake = await fetch_pancakeswap_price(token_pair)
-    binance = await fetch_binance_price(token_pair)
-
-    if pancake and binance:
-        return (pancake * PANCAKE_WEIGHT) + (binance * BINANCE_WEIGHT)
-    elif pancake:
-        return pancake
-    elif binance:
-        return binance
-    return None
-```
-
-3d. price_feed 테스트
-Claude Code:
-tests/test_price_feed.py를 작성해줘.
+- 가중 평균: PancakeSwap 60%, Binance 40%
+- 폴백: 한쪽 실패 시 나머지 단독, 둘 다 실패 시 None
+- 시그니처: async def get_fair_price(token_pair: str) -> float | None
+2d. 테스트
+Cursor 프롬프트:
+@price_feed/ 모듈 전체에 대한 tests/test_price_feed.py를 작성해줘.
 
 테스트 케이스:
-1. pancakeswap 성공 + binance 성공 → 가중 평균 검증
-2. pancakeswap 성공 + binance 실패 → pancakeswap 단독
-3. pancakeswap 실패 + binance 성공 → binance 단독
+1. 양쪽 성공 → 가중 평균 검증 (구체적 수치로)
+2. pancakeswap만 성공 → pancakeswap 단독
+3. binance만 성공 → binance 단독
 4. 둘 다 실패 → None
-5. 실제 API 호출 통합 테스트 (마커: @pytest.mark.integration)
+5. 실제 API 호출 (@pytest.mark.integration)
 
-httpx 응답을 monkeypatch/mock으로 제어해서 유닛 테스트 작성.
-pytest-asyncio 사용.
+httpx 응답을 monkeypatch로 mock. pytest-asyncio 사용.
+Cursor 터미널: pytest tests/test_price_feed.py -v
+Git commit: feat: implement price feed module
 
-Cursor: pytest tests/test_price_feed.py 실행, 실패 케이스 디버깅.
-Git commit: feat: implement price feed module with PancakeSwap + Binance
+Phase 3: prompt.py + schema.py (Day 3)
+3a. prompt.py
+Cursor 프롬프트:
+@docs/MATCHING_RULES.md 를 참고해서 matching/prompt.py를 작성해줘.
 
-### Phase 4: matching 모듈 — 프롬프트 + 스키마 (Day 3)
-4a. prompt.py
-Cursor에서 직접 작성. 위에서 구체화한 시스템 프롬프트를 문자열 상수로 정의. 이건 Claude Code보다 직접 문장을 다듬는 게 낫다.
-```python
-SYSTEM_PROMPT = """You are an OTC matching engine..."""
+두 가지를 만들어야 해:
+1. SYSTEM_PROMPT 상수: LLM에게 매칭 규칙을 지시하는 시스템 프롬프트.
+   규칙: 가격 호환성, 공정가 기준 체결가 산출, 다자간 분할 매칭(체결량 최대화), JSON만 반환.
+2. build_user_message(orders: list[Order], fair_price: float) -> str 함수:
+   주문 리스트 + 공정가를 JSON 문자열로 조합. @matching/types.py 의 Order 모델 사용.
+이건 생성 후에 직접 프롬프트 문구를 다듬어. LLM이 규칙을 잘 따르는지는 나중에 실제 호출로 확인.
+3b. schema.py
+Cursor 프롬프트:
+@docs/INTERFACE_SPEC.md @matching/types.py 를 참고해서 matching/schema.py를 작성해줘.
 
-def build_user_message(orders: list[Order], fair_price: float) -> str:
-    """주문 리스트 + 공정가를 JSON 문자열로 조합"""
-    ...
-```
+두 가지 방식을 모두 준비:
+1. response_format용 JSON 스키마 (dict)
+2. function calling용 tools 파라미터 (dict)
 
-4b. schema.py
-Claude Code:
-matching/schema.py를 작성해줘.
+스키마 구조:
+- matches: [{match_id, maker_order_id, maker_wallet, taker_order_id, taker_wallet, token_pair, fill_amount, execution_price}]
+- remaining_orders: [{order_id, side, token_pair, original_amount, remaining_amount, limit_price, wallet_addr}]
+- fair_price_used: float
 
-요구사항:
-- OpenAI API의 response_format에 넘길 JSON 스키마를 정의한다
-- 스키마는 위 구체화 문서의 응답 JSON 구조와 일치해야 한다
-  (matches 배열, remaining_orders 배열, fair_price_used)
-- function calling 방식으로도 전환 가능하도록 tools 파라미터용 함수 정의도 같이 만들어줘
-- 둘 다 만들고, engine.py에서 선택할 수 있게 해줘
-
-Cursor: 스키마 리뷰. 필드 누락 확인.
+engine.py에서 어느 방식을 쓸지 선택할 수 있게 함수로 분리해줘.
 Git commit: feat: add matching prompt and response schema
 
-### Phase 5: matching 모듈 — 엔진 + 후검증 (Day 4~5)
-5a. engine.py
-Claude Code:
-matching/engine.py를 작성해줘.
+Phase 4: engine.py (Day 4)
+Cursor 프롬프트:
+@Near AI openai compatibility @OpenAI API Python @matching/prompt.py @matching/schema.py @matching/types.py 를 참고해서 matching/engine.py를 작성해줘.
 
-요구사항:
 - openai 라이브러리 사용 (from openai import OpenAI)
-- base_url은 환경변수 NEAR_AI_BASE_URL에서 읽기 (기본값: [https://api.near.ai/v1](https://api.near.ai/v1))
-- api_key도 환경변수 NEAR_AI_API_KEY에서 읽기
-- 모델명도 환경변수 NEAR_AI_MODEL에서 읽기 (기본값: deepseek-ai/DeepSeek-V3.1)
+- 환경변수에서 읽기: NEAR_AI_BASE_URL (기본값 확인 필요), NEAR_AI_API_KEY, NEAR_AI_MODEL
 - temperature=0.0
 - prompt.py의 SYSTEM_PROMPT와 build_user_message 사용
 - schema.py의 response_format 스키마 사용
-- 응답을 JSON 파싱해서 dict로 반환
-- API 호출 실패, 파싱 실패 시 예외를 잡아서 에러 메시지 포함한 dict 반환
-- 함수 시그니처: def call_matching(orders: list[Order], fair_price: float) -> dict
+- 응답 JSON 파싱해서 dict 반환
+- API 실패, 파싱 실패 시 에러 메시지 포함한 dict 반환
+- 시그니처: def call_matching(orders: list[Order], fair_price: float) -> dict
+.env 파일 생성 (Cursor 터미널에서):
+bashecho "NEAR_AI_BASE_URL=https://api.near.ai/v1" >> .env
+echo "NEAR_AI_API_KEY=your-key-here" >> .env
+echo "NEAR_AI_MODEL=deepseek-ai/DeepSeek-V3.1" >> .env
+echo ".env" >> .gitignore
+실제 API 호출 테스트를 Cursor 터미널에서 돌려보면서 프롬프트 튜닝.
+Git commit: feat: implement NEAR AI Cloud engine
 
-Cursor: NEAR AI Cloud API 키 세팅, 실제 호출 테스트. .env 파일 생성 + .gitignore에 .env 추가.
+Phase 5: validator.py (Day 5)
+Cursor 프롬프트:
+@docs/ARCHITECTURE.md 의 3-3 후검증 섹션과 @matching/types.py 를 참고해서 matching/validator.py를 작성해줘.
 
-5b. validator.py
-Claude Code:
-matching/validator.py를 작성해줘.
+입력: raw_result(dict), orders(list[Order]), fair_price(float), prev_fair_price(float|None)
 
-요구사항:
-- LLM이 반환한 매칭 결과(dict)를 기계적으로 검증하는 모듈
-- 입력: raw_result(dict), orders(list[Order]), fair_price(float), prev_fair_price(float|None)
-- 검증 항목 (순서대로):
-  1. maker_order_id, taker_order_id가 실제 주문에 존재하는지
-  2. 체결가가 매수자 limit_price 이하인지
-  3. 체결가가 매도자 limit_price 이상인지
-  4. order_id별 누적 체결량이 원래 주문 수량을 초과하지 않는지
-  5. prev_fair_price 대비 변동폭이 2% 초과하면 전체 라운드 보류
-- 검증 실패한 매칭은 제거, 통과한 것만 반환
-- 반환: ValidatedResult(accepted: list[MatchResult], rejected: list[dict], round_held: bool)
-- rejected에는 {match, reason} 형태로 거부 사유 기록
+검증 순서:
+1. maker_order_id, taker_order_id가 실제 주문에 존재하는지
+2. 체결가 ≤ 매수자 limit_price
+3. 체결가 ≥ 매도자 limit_price
+4. order_id별 누적 체결량 ≤ 원래 주문 수량
+5. prev_fair_price 대비 변동 > 2%면 전체 라운드 보류
 
-Cursor: 엣지케이스 직접 테스트.
-
-5c. validator 테스트
-Claude Code:
-tests/test_validator.py를 작성해줘.
+검증 실패한 매칭은 제거, 통과한 것만 반환.
+반환 타입: ValidatedResult(accepted: list[MatchResult], rejected: list[dict], round_held: bool)
+rejected에는 {match, reason} 형태로 거부 사유.
+테스트 — Cursor 프롬프트:
+@matching/validator.py 에 대한 tests/test_validator.py를 작성해줘.
 
 테스트 케이스:
 1. 정상 매칭 → 전부 통과
-2. 체결가가 매수자 limit 초과 → 해당 매칭 거부
-3. 체결가가 매도자 limit 미만 → 해당 매칭 거부
-4. 누적 체결량이 주문 수량 초과 → 해당 주문 관련 매칭 전부 거부
-5. 존재하지 않는 order_id → 해당 매칭 거부
-6. 공정가 변동 3% → 라운드 전체 보류 (round_held=True)
+2. 체결가 > 매수자 limit → 거부
+3. 체결가 < 매도자 limit → 거부
+4. 누적 체결량 > 주문 수량 → 거부
+5. 존재하지 않는 order_id → 거부
+6. 공정가 변동 3% → round_held=True
 7. 공정가 변동 1.5% → 정상 통과
-8. prev_fair_price가 None → 변동성 체크 스킵
+8. prev_fair_price None → 변동성 체크 스킵
+Cursor 터미널: pytest tests/test_validator.py -v
+Git commit: feat: implement post-validation
 
-Cursor: pytest tests/test_validator.py 실행.
-Git commit: feat: implement NEAR AI engine + post-validation
+Phase 6: interface.py 통합 (Day 6)
+Cursor 프롬프트:
+@docs/ARCHITECTURE.md @matching/types.py @price_feed/aggregator.py @matching/engine.py @matching/validator.py @state.py 를 전부 참고해서 interface.py를 작성해줘.
 
-### Phase 6: interface.py 통합 (Day 6)
-Claude Code:
-interface.py를 작성해줘. 모든 모듈을 엮는 진입점.
+현승님 TEE 엔진이 이 함수 하나만 호출한다:
+async def run_matching(orders: list[Order]) -> MatchingResponse
 
-요구사항:
-- 함수 시그니처: async def run_matching(orders: list[Order]) -> MatchingResponse
-- 현승님 TEE 엔진이 이 함수만 호출하면 된다
-- 내부 흐름:
-  1. orders에서 token_pair 추출
-  2. get_fair_price() 호출 → 실패 시 에러 반환
-  3. call_matching() 호출 → 실패 시 에러 반환
-  4. validate_matches() 호출
-  5. state.update_fair_price()
-  6. 잔여 주문 산출 (원래 수량 - 누적 체결량)
-  7. MatchingResponse 반환
-- state.py의 matching_state 싱글턴 사용
-- 각 단계에서 에러 발생 시 적절한 MatchingResponse 반환 (error 필드에 메시지)
+내부 흐름:
+1. orders[0].token_pair로 토큰 페어 추출
+2. get_fair_price() → 실패 시 에러 MatchingResponse
+3. call_matching() → 실패 시 에러 MatchingResponse
+4. validate_matches() → round_held면 에러 MatchingResponse
+5. matching_state.update_fair_price()
+6. 잔여 주문 산출
+7. MatchingResponse 반환
+통합 테스트 — Cursor 프롬프트:
+@interface.py 에 대한 tests/test_matching.py를 통합 테스트로 작성해줘.
 
-Cursor: 모든 import 경로 확인, 통합 테스트 실행.
+시나리오:
+1. 앨리스 매도 100 BNB @ 580, 밥 매수 60 BNB @ 585 → 60개 매칭
+2. 매도 100, 매수 60, 매수 50 → 다자간 분할
+3. 매수가 < 매도가 → 빈 결과
+4. 주문 0건 → 에러
+5. 가격 피드 실패 → 에러
 
-통합 테스트
-Claude Code:
-tests/test_matching.py를 통합 테스트로 작성해줘.
-
-테스트 시나리오:
-1. 앨리스 매도 100 BNB @ 580, 밥 매수 60 BNB @ 585 → 60개 매칭, 잔여 40
-2. 주문 3개: 매도 100, 매수 60, 매수 50 → 다자간 분할 매칭
-3. 매수가 < 매도가 → 매칭 불가, 빈 결과
-4. 주문 0건 → 에러 반환
-5. 가격 피드 실패 → 에러 반환
-
-NEAR AI Cloud 호출은 mock으로 처리.
-mock이 반환하는 JSON은 schema.py 포맷과 일치하도록.
-
-Cursor: pytest tests/ 전체 실행, 커버리지 확인.
+NEAR AI Cloud 호출은 mock 처리. mock 반환 JSON은 schema.py 포맷 준수.
+Cursor 터미널: pytest tests/ -v 전체 실행.
 Git commit: feat: integrate all modules in interface.py
 
-### Phase 7: 현승님 연동 테스트 (Day 7~8)
-Cursor (메인):
-현승님 TEE 엔진에서 run_matching() 실제 호출
-NEAR AI Cloud API 키 세팅 + 실제 LLM 호출 테스트
-응답 포맷이 스키마와 맞는지 확인
-프롬프트 튜닝: LLM이 규칙을 잘 따르는지, 엣지케이스에서 어떻게 응답하는지
+Phase 7: 현승님 연동 (Day 7~8)
+이 단계부터는 프롬프트가 아니라 Cursor에서 직접 디버깅이 핵심.
+Cursor에서 할 일:
 
-Claude Code:
-연동 중 발견된 버그 리팩토링
-프롬프트 변경 시 테스트 케이스 업데이트
+현승님 TEE 엔진에서 run_matching() 실제 호출 테스트
+NEAR AI Cloud 실제 호출 → 프롬프트 튜닝 (LLM이 규칙을 안 따르면 prompt.py 수정)
+응답 포맷이 schema.py와 안 맞으면 schema.py 수정
+wallet_addr가 MatchResult까지 잘 전달되는지 확인
 
-Git commit: fix: integration adjustments with TEE engine
+Claude Code (보조):
 
-### Phase 8: 데모 안정화 + 발표 준비 (Day 9~10)
-Cursor:
-앨리스/밥 시나리오 풀플로우 반복 테스트
-에러 메시지 정리 (데모 중 에러 나도 깔끔하게 보이도록)
-대윤 데모 영상 촬영 지원
+연동 중 반복 패턴의 버그가 발견되면 리팩토링
+테스트 케이스 추가
 
-Claude Code:
-README 작성 (설치법, 환경변수, 실행법, 아키텍처 다이어그램)
-코드 정리 + 불필요한 주석 제거
 
-Git commit: docs: add README + cleanup for demo
+Phase 8: 데모 안정화 (Day 9~10)
+Cursor에서 할 일:
+
+풀플로우 반복 테스트 (앨리스/밥 시나리오)
+에러 메시지 정리
+대윤 데모 영상 지원
+
+Claude Code (보조):
+
+README.md 작성 (설치법, 환경변수, 실행법, 아키텍처)
+코드 정리
+
+
+
+미팅 공유용
+NEAR AI Cloud가 뭔데?
+NEAR AI Cloud는 NEAR 블록체인이 운영하는 AI 추론 플랫폼이야. 핵심 특징이 하나 있는데, 모든 AI 추론이 TEE(신뢰 실행 환경) 안에서 돌아간다는 거야.
+일반적인 AI API(ChatGPT, Claude API 등)는 내가 보낸 프롬프트를 서버 운영자가 기술적으로 볼 수 있어. "안 본다"고 약속할 뿐이지, 구조적으로 못 보는 건 아니야.
+NEAR AI Cloud는 다르다. 내가 보낸 프롬프트와 데이터가 하드웨어 레벨에서 격리된 TEE 안으로 들어가고, 이 안에서 AI 모델이 추론을 수행해. TEE 안의 데이터는 NEAR AI Cloud 운영자조차 열람이 불가능하고, "이 결과가 진짜 TEE 안에서 나온 거다"라는 암호학적 증명(attestation)까지 제공돼.
+사용 방식은 간단해. OpenAI SDK를 그대로 쓰되, base_url만 NEAR AI Cloud로 바꾸면 끝이야. 코드 한 줄 차이로 "신뢰 기반 AI"에서 "검증 가능한 프라이빗 AI"로 전환되는 거지.
+
+왜 NEAR AI를 써야 하는가
+기술적 이유: TEE 없이는 다크풀이 안 된다
+우리 프로토콜의 핵심 모순을 다시 짚어보면:
+
+"탈중앙화하면 정보가 공개되고, 정보를 숨기면 중앙화된 신뢰가 필요하다."
+
+매칭 로직을 어디서 실행하느냐에 따라 세 가지 선택지가 있어:
+선택지 1: 온체인 스마트 컨트랙트에서 매칭
+→ 코드와 입력이 전부 공개됨. 주문 내용이 체인에 올라가는 순간 프론트러닝 당함. 다크풀의 의미가 사라짐.
+선택지 2: 일반 서버에서 매칭
+→ 주문을 숨길 수는 있지만, 서버 운영자가 주문 전부를 볼 수 있음. "운영자를 믿어라"가 됨. 중앙화 OTC 데스크와 다를 게 없음.
+선택지 3: TEE 안에서 매칭
+→ 주문이 TEE 안으로 들어가면 운영자도 못 보고, 결과만 암호학적 증명과 함께 나옴. 탈중앙화와 프라이버시를 동시에 달성. 이게 DarkPool Lite.
+ZKP(영지식 증명)로도 이론적으로 가능하지만, 다자간 실시간 매칭에 ZKP를 적용하면 증명 생성에 수십 초~수 분이 걸려서 OTC에 비현실적이야. TEE는 밀리초 단위로 처리 가능.
+대회적 이유: Near AI 트랙 심사 기준에 정확히 맞는다
+Near AI 트랙 심사 기준을 보면:
+기준배점우리 프로젝트가 맞는 이유Innovation30%"매칭 엔진을 TEE 안의 LLM으로 돌린다"는 구조 자체가 새로움Impact25%고래들의 MEV 피해는 실제 문제. 프라이빗 AI 없이는 해결 불가Technical Excellence20%OpenAI SDK + attestation 검증Privacy Design15%주문 의향이 TEE 밖으로 절대 나가지 않는 설계
+트랙 설명에서 예시로 든 유스케이스 중 하나가 이거야:
+
+"Collaborative AI, where multiple parties contribute data without revealing it to each other"
+
+여러 트레이더가 주문 데이터를 기여하되, 서로 내용을 못 보는 구조. 이게 정확히 우리 프로젝트.
+그러면 LLM이 아니라 TEE 안에서 규칙 기반 코드를 돌리면 안 되나?
+기술적으로는 가능해. Phala Cloud의 Shade Agent처럼 커스텀 코드를 TEE에 배포하는 방법도 있어. 근데 두 가지 이유로 LLM을 쓰는 게 낫다:
+첫째, 트랙이 "AI" 트랙이다. NEAR AI Cloud의 핵심 제품이 TEE 기반 AI 추론이고, 심사에서 이걸 활용하는 걸 기대하고 있어. if문 코드를 TEE에 넣는 것보다 LLM이 TEE 안에서 매칭하는 게 Innovation 30%에서 훨씬 유리해.
+둘째, 후검증으로 안전성을 확보할 수 있다. "LLM이 확률적이라 매칭을 잘못하면 어쩌냐"는 걱정이 당연한데, 그래서 내가 후검증 모듈을 만드는 거야. LLM이 틀려도 후검증에서 기계적으로 걸러내니까 최종 결과는 항상 규칙을 만족해. LLM은 매칭을 "제안"하고, 코드가 "승인"하는 이중 구조.
+
+
+AI 매칭인데, 무엇을 매칭하는가?
+매수 주문과 매도 주문을 매칭한다. 앨리스가 "BNB 100개를 580 USDT 이상에 팔겠다"고 하고, 밥이 "BNB 60개를 585 USDT 이하에 사겠다"고 하면, 이 두 주문을 짝지어서 체결시키는 게 내 모듈이 하는 일이다.
+현승님 TEE 엔진이 주문 리스트를 넘기면, 내 모듈이 매칭 결과를 만들어서 돌려주는 구조. 현승님한테는 블랙박스야. run_matching(orders) 하나만 호출하면 된다.
+이게 구체적으로 뭘 하는 건가?
+단순히 "매수가 ≥ 매도가면 체결"하는 게 아니라, 세 가지를 한다.
+첫째, 최적 실행가 산출. PancakeSwap과 Binance에서 실시간 시세를 가져와서 가중 평균으로 공정가를 계산한다. 예를 들어 PancakeSwap에서 BNB가 581 USDT, Binance에서 583 USDT면, 가중 평균으로 582.3 USDT가 공정가가 된다. 앨리스 매도 희망가(580) ≤ 공정가(582.3) ≤ 밥 매수 희망가(585)이므로, 양쪽 다 손해 안 보는 582.3 USDT에 체결한다.
+둘째, 다자간 분할 매칭. 주문이 3개 이상이면 체결량을 최대화하는 조합을 찾는다. 매도 A가 100개, 매수 B가 60개, 매수 C가 50개라면, A-B 60개를 먼저 매칭하고 A의 잔여 40개를 C와 매칭한다. C의 나머지 10개는 대기.
+셋째, 슬리피지 보호. 시장이 급변해서 공정가가 직전 라운드 대비 2% 이상 튀면, 그 라운드 매칭을 보류한다. 유저 희망가에서 크게 벗어나는 체결을 막는 가드레일이다.
+AI라는 건 어떤 모델을 뜻하는가?
+NEAR AI Cloud에서 제공하는 LLM을 쓴다. NEAR AI Cloud는 OpenAI SDK 호환 추론 API인데, 핵심은 모든 추론이 TEE 안에서 실행된다는 거다.
+내가 주문 데이터 + 시세 + 매칭 규칙을 OpenAI SDK로 NEAR AI Cloud에 보내면, LLM이 TEE 안에서 매칭을 수행하고 결과를 JSON으로 반환한다. 프롬프트, 주문 내용, 결과 전부 TEE 안에서 암호학적으로 격리되어서 운영자도 못 본다.
+그런데 LLM은 확률적으로 동작하니까 잘못된 매칭을 할 수도 있다. 그래서 후검증 모듈을 둔다. LLM이 반환한 결과를 내 코드가 기계적으로 검증해서, 체결가가 희망가 범위를 벗어나거나 수량이 맞지 않으면 거부한다. LLM이 매칭을 "제안"하고, 코드가 "승인"하는 이중 구조.
+정리하면 내 파트의 코드 실행 순서는 이렇다:
+
+PancakeSwap + Binance에서 시세 수집 → 공정가 산출
+주문 + 시세 + 매칭 규칙을 NEAR AI Cloud LLM에 전송 (TEE 진입)
+LLM이 TEE 안에서 매칭 수행, 결과 JSON 반환
+후검증으로 결과 검증
+현승님에게 매칭 결과 반환
+
+진행상황
+현승님과 인터페이스 합의 완료. 입력은 주문 리스트(wallet_addr 포함), 출력은 매칭 결과 + 잔여 주문 + 공정가. 가격 피드는 내가 직접 수집하고, 상태 관리도 내 모듈 내부에서 한다.
+프로젝트 폴더 구조 세팅 완료. 모듈 내부 처리 흐름 구체화 완료. 개발 액션 플랜 8단계로 작성 완료.
+오늘 미팅 끝나면 types.py(데이터 모델)부터 코드 작성 시작한다.
