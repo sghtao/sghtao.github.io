@@ -1,8 +1,7 @@
 ---
-layout: post
-title: "DarkPool Lite"
-date: 2026-04-04 02:00:00 +0900
-categories: [Blockchain, Hackathon]
+title: "BuidlHack 2026 - DarkPool Lite 프로젝트 개요"
+date: 2026-04-03 00:00:00 +0900
+categories: [BlueNode - Blockchain, Hackathon]
 tags: [DarkPool, TEE, DEX, MEV, BuidlHack]
 ---
 
