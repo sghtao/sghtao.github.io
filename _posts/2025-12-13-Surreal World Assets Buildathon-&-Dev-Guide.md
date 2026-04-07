@@ -5,7 +5,7 @@ categories: [BlueNode - Blockchain, Hackathon]
 tags: [blockchain, competition]
 ---
  
-![alt text](/assets/img/surrealimage.png)
+![alt text](/assets/img/storyimage.png)
  
 블루노드에 들어간 게 25년 11월이다. 마침 개발 팀에서 다 같이 참여하는 해커톤이 하나 있어, 팀에 합류해 참가하게 되었다.
  
@@ -130,7 +130,7 @@ Story는 IP를 위해 특별히 설계된 Layer 1 블록체인이다. IP를 블�
  
 🔗 [companion-camp-backend](https://github.com/sghtao/companion-camp-backend)
  
-![alt text](storyhacksubmission.png)
+![alt text](/assets/img/storyhacksubmission.png)
  
 ---
  
