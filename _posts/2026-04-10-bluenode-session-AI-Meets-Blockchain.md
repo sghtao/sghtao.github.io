@@ -23,7 +23,7 @@ tags: [blockchain, session, ai, web3, ai-agent, coinfello]
 
 연사는 CoinFello의 신형섭님이었다. CoinFello라는 AI Agent를 소개해주셨고, 이를 직접 사용해보는 실습을 가졌다.
 
-![코인펠로](/assets/img/coinfellow.png)
+![코인펠로](/assets/img/coinfello.png)
 
 CoinFello 활용 예시로 swap을 주로 보여주셨는데, trading이나 polymarket 같은 곳에서도 활용할 수 있다고 하셨다.
 
