@@ -53,7 +53,7 @@ CoinFello 활용 예시로 swap을 주로 보여주셨는데, trading이나 poly
 
 WSL 사용 (연사님은 원래 Mac을 쓰신다고 한다). Claude API 키를 발급받고, 텔레그램 봇의 API 키도 발급받았다. 그런 다음 nvm과 Node.js 24버전을 설치했다.
 
-![Node.js 설치](/assets/img/스크린샷%202026-04-10%20200208.png)
+![Node.js 설치](/assets/img/nodejs설치.png)
 
 그런 다음 OpenClaw를 설치했다.
 
@@ -81,9 +81,9 @@ clawhub에서 CoinFello 스킬을 설치한 다음, 자연어로 내가 원하�
 
 텔레그램과도 연동했다.
 
-![텔레그램 연동](/assets/img/스크린샷%202026-04-10%20205023.png)
+![텔레그램 연동](/assets/img/텔레그렘연동.png)
 
-![텔레그램 연동 2](/assets/img/스크린샷%202026-04-10%20205234.png)
+![텔레그램 연동 2](/assets/img/텔레그렘연동2.png)
 
 WSL에서 오픈 클로가 켜진 상태로, 텔레그램 봇에 요청을 해도 온체인에서 원하는 거래나 결과를 얻을 수 있다.
 
