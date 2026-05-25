@@ -344,7 +344,7 @@ sed -i 's/anthropic\/claude-sonnet-4.5/openrouter\/anthropic\/claude-sonnet-4.5/
 roma-dspy solve "What is Uniswap V4?"
 ```
 
-![에이전트 테스트 쿼리 결과](/assets/images/에이전트테스트쿼리결과.png)
+![에이전트 테스트 쿼리 결과](/assets/img/에이전트테스트쿼리결과.png)
 
 Hooks, Singleton Contract Architecture, Flash Accounting, Native ETH Support까지 핵심 내용이 구조적으로 잘 정리됐다. Atomizer → Planner → Executor → Aggregator → Verifier 전체 파이프라인이 정상 동작한 것이다.
 
@@ -520,7 +520,7 @@ api 설정하고
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 
 
-![alt text](/assets/images/에이전트테스트쿼리결과.png)
+![alt text](/assets/img/에이전트테스트쿼리결과.png)
 
 
 
@@ -768,6 +768,7 @@ Gemini 3 Flash $0.0155 11회
 
 로그 에러 원인 파악하기
 
+```text
 (research-agent) sgh_3591@GHGalaxyBook5Pro:~/research-agent$ python ~/research-agent/blockchain_agent.py "RWA 시장 구조를 분석해줘. 스테이블코인 제외 전체 시장 규모, 자산군별 구성 비중, 레포 계약이 시장에서 차지하는 의미, 분산형 vs 표현형 자산의 차이와 시사점을 한국어 리서치 리포트 형식으로 작성해줘."
 2026-04-12 19:34:44.462 | WARNING  | roma_dspy.tools.terminal.tmux_session:<module>:18 - libtmux not installed. TmuxSession will not be available.
 2026-04-12 19:34:45.056 | INFO     | roma_dspy.core.predictors.code_act_patch:apply_code_act_patch:96 - Applied CodeAct patch to inject typing imports into interpreter
@@ -997,6 +998,7 @@ Using Jina Reranker
 2026/04/12 19:38:46 WARNING dspy.primitives.module: Calling module.forward(...) on ChainOfThought directly is discouraged. Please use module(...) instead.
 2026/04/12 19:39:11 WARNING dspy.primitives.module: Calling module.forward(...) on Verifier directly is discouraged. Please use module(...) instead.
 2026/04/12 19:39:11 WARNING dspy.primitives.module: Calling module.forward(...) on ChainOfThought directly is discouraged. Please use module(...) instead.
+```
 
 -------------------------
 
@@ -1067,8 +1069,7 @@ crypto_agent.yaml config 읽어서 실행
 
 우리 에이전트 뭐 이런거 말고, 그냥 ROMA에서 내가 정한 모델 쓰고, 구조는 뒤에 바꾸는 걸로
 
-
-bash
+```bash
 # conda 환경 생성 (Python 3.14.4)
 conda create -n research-agent python=3.14.4 -y
 conda activate research-agent
