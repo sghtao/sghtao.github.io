@@ -1,10 +1,14 @@
 ---
-title: "RWA의 모든 것 (2): 세계 금융의 심장, 레포 시장"
-date: 2026-04-06 00:01:00 +0900
-categories: [BlueNode - Blockchain, Research]
-tags: [blockchain, research, rwa]
+title: 'RWA의 모든 것 (2): 세계 금융의 심장, 레포 시장 (수정 전)'
+date: '2026-04-06 00:01:00 +0900'
+categories:
+  - BlueNode - Blockchain
+  - Research
+tags:
+  - blockchain
+  - research
+  - rwa
 ---
-
 RWA의 모든 것 시리즈 | BlueNode 2026 동계 리서치
 
 1편: 하나의 시장, 두 개의 세계

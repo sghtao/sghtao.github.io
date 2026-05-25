@@ -215,6 +215,9 @@ exclude:
   - purgecss.js
   - "*.config.js"
   - "package*.json"
+  # Local-only React editor + Node bridge. Source ships with the repo for
+  # backup, but Jekyll must NOT include it in the public build.
+  - blog-app
 
 jekyll-archives:
   enabled: [categories, tags]
