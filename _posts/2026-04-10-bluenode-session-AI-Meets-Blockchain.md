@@ -57,27 +57,27 @@ WSL 사용 (연사님은 원래 Mac을 쓰신다고 한다). Claude API 키를 �
 
 그런 다음 OpenClaw를 설치했다.
 
-![OpenClaw 설치](/assets/img/스크린샷 2026-04-10 201133.png)
+![OpenClaw 설치](/assets/img/스크린샷%202026-04-10%20201133.png)
 
 skills가 있었는데, 이건 나중에 찾아보도록 하자.
 
-![skills](/assets/img/스크린샷 2026-04-10 201708.png)
+![skills](/assets/img/스크린샷%202026-04-10%20201708.png)
 
 hatch 뭐시기는 못하고 넘어갔다.
 
-![hatch](/assets/img/스크린샷 2026-04-10 202032.png)
+![hatch](/assets/img/스크린샷%202026-04-10%20202032.png)
 
 오픈 클로가 잘 설치된 모습이다.
 
-![OpenClaw 설치 완료](/assets/img/스크린샷 2026-04-10 203223.png)
+![OpenClaw 설치 완료](/assets/img/스크린샷%202026-04-10%20203223.png)
 
-![OpenClaw 설치 완료 2](/assets/img/스크린샷 2026-04-10 203235.png)
+![OpenClaw 설치 완료 2](/assets/img/스크린샷%202026-04-10%20203235.png)
 
 clawhub에서 CoinFello 스킬을 설치한 다음, 자연어로 내가 원하는 요청을 입력하면 원하는 결과를 얻을 수 있다!
 
-![CoinFello 스킬 실행](/assets/img/스크린샷 2026-04-10 204536.png)
+![CoinFello 스킬 실행](/assets/img/스크린샷%202026-04-10%20204536.png)
 
-![CoinFello 스킬 실행 2](/assets/img/스크린샷 2026-04-10 204707.png)
+![CoinFello 스킬 실행 2](/assets/img/스크린샷%202026-04-10%20204707.png)
 
 텔레그램과도 연동했다.
 

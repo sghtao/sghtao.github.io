@@ -1,5 +1,35 @@
 [
   {
+    "id": "str_mqj2ba3r",
+    "name": "Data Dashboard",
+    "description": "",
+    "posts": [
+      "2026-06-18-dashboard-구축-시작.md"
+    ],
+    "createdAt": "2026-06-18T05:31:33.735Z",
+    "updatedAt": "2026-06-18T05:44:29.519Z"
+  },
+  {
+    "id": "str_mqiac36f",
+    "name": "Data Science 경진대회",
+    "description": "",
+    "posts": [
+      "2026-06-18-한국데이터정보과학회-sas-korea-경진대회.md",
+      "2026-06-18-optimization-grand-challenge-2026-참가.md",
+      "2026-06-18-ogc-1주차.md"
+    ],
+    "createdAt": "2026-06-17T16:28:22.167Z",
+    "updatedAt": "2026-06-18T05:30:20.863Z"
+  },
+  {
+    "id": "str_mqiac36d",
+    "name": "Data Science 경진대회",
+    "description": "",
+    "posts": [],
+    "createdAt": "2026-06-17T16:28:22.165Z",
+    "updatedAt": "2026-06-17T16:28:22.165Z"
+  },
+  {
     "id": "str_moyjc6ck",
     "name": "블루노드 온보딩 스터디",
     "description": "",

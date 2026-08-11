@@ -27,7 +27,7 @@ STACK CANARY - Canary found
 NX - NX enabled
 PIE - PIE enabled
 
-![alt text](assets/img/스크린샷 2026-03-31 001154.png)
+![alt text](/assets/img/스크린샷%202026-03-31%20001154.png)
  
 `checksec` 명령어 결과에서 초록색 텍스트는 해당 보호 기법이 켜져 있고 안전하게 적용되어 있다는 것을 의미한다. 빨간색이 있다면 방어막이 꺼져있거나 적용되지 않아 보안이 취약한 상태다.
  
@@ -37,9 +37,9 @@ PIE - PIE enabled
  
 스택 카나리는 함수의 프롤로그에서 스택 버퍼와 반환 주소 사이에 임의의 값을 삽입하고, 함수의 에필로그에서 해당 값의 변조를 확인하는 보호 기법이다. 카나리 값의 변조가 확인되면 프로세스는 강제 종료된다. 즉, 함수의 복귀 주소(Return Address)가 덮어씌워지는 것을 탐지하기 위해, 스택의 로컬 변수와 복귀 주소 사이에 삽입되는 임의의 값(Random Value)이다.
  
-![alt text](assets/img/스크린샷 2026-03-31 002418.png)
-![alt text](assets/img/스크린샷 2026-03-31 002505.png)
-![alt text](assets/img/스크린샷 2026-03-31 003243.png)
+![alt text](/assets/img/스크린샷%202026-03-31%20002418.png)
+![alt text](/assets/img/스크린샷%202026-03-31%20002505.png)
+![alt text](/assets/img/스크린샷%202026-03-31%20003243.png)
 buf[8]을 해놓고 32바이트 데이터를 read 하려고 해서 경고를 주는 모습
  
 ### 카나리 비활성화/활성화 실습
